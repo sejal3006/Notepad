@@ -1,25 +1,40 @@
-import logo from './logo.svg';
+
+import React, { useState, useEffect } from 'react';
+import NoteList from './NoteList';
+import AddNoteForm from './AddNoteForm';
 import './App.css';
 
-function App() {
+const App = () => {
+  const [notes, setNotes] = useState([]);
+
+  useEffect(() => {
+    const savedNotes = JSON.parse(localStorage.getItem('notes') || '[]');
+    setNotes(savedNotes);
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('notes', JSON.stringify(notes));
+  }, [notes]);
+
+  const handleAddNote = (text) => {
+    const newNote = {
+      id: Date.now(),
+      text,
+    };
+    setNotes([...notes, newNote]);
+  };
+
+  const handleDeleteNote = (id) => {
+    setNotes(notes.filter((note) => note.id !== id));
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="app" >
+      <h1 style={{marginLeft : "30px", textAlign : "center"}}>Notes App</h1>
+      <AddNoteForm onAdd={handleAddNote} />
+      <NoteList notes={notes} onDelete={handleDeleteNote} />
     </div>
   );
-}
+};
 
 export default App;
